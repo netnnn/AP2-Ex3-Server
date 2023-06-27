@@ -1,3 +1,4 @@
+import { androidUsersFirebaseTokens } from "../models/users.js";
 import {
   getChatsByUserName,
   addChat,
@@ -7,6 +8,7 @@ import {
   readChat,
   addMsgByChatId,
   getAllMsgByChatId,
+  getUser2
 } from "../services/chats.js";
 
 import jwt from "jsonwebtoken";
@@ -41,6 +43,10 @@ async function addNewChat(req, res) {
     var answer = await addChat(username, friendUserName); //return json created chat if addition succeded, else return: ''.
 
     if (answer != null) {
+      const firebaseToken = androidUsersFirebaseTokens.get(friendUserName);
+      if (firebaseToken != undefined) {
+        //push notification
+      }
       return res.status(200).send(answer);
     }
 
@@ -117,6 +123,10 @@ async function sendMessage(req, res) {
 
   var answer_json = await addMsgByChatId(username, chatId, content);
   if (answer_json != null) {
+    const firebaseToken = androidUsersFirebaseTokens.get(getUser2(chatId));
+    if (firebaseToken != undefined) {
+      //push notification
+    }
     return res.status(200).send(answer_json);
   }
   return res.status(500).send("error occuered on sending msg");

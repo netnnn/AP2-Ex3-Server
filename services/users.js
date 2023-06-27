@@ -1,4 +1,4 @@
-import { User } from "../models/users.js";
+import { User, androidUsersFirebaseTokens } from "../models/users.js";
 import { getHighestIdUsers, increaseHighestIdUsers } from "../app.js";
 import { isMember } from "./chats.js";
 
@@ -78,6 +78,10 @@ const isFriends = async (username, friendUserName) => {
   return false;
 };
 
+const updateMapOnAndroidLogin = async (username, firebaseToken) => {
+  androidUsersFirebaseTokens.set(username, firebaseToken);
+}
+
 export {
   createUser,
   readUserByName,
@@ -88,4 +92,5 @@ export {
   getDisplasyNameUserByUsername,
   addUser,
   isFriends,
+  updateMapOnAndroidLogin
 };

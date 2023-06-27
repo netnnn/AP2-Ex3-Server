@@ -1,5 +1,5 @@
-import { getUserDetailsByUsername } from "../services/chats.js";
-import { addUser, isFriends } from "../services/users.js";
+import { getUserDetailsByUsername, } from "../services/chats.js";
+import { addUser, isFriends, updateMapOnAndroidLogin } from "../services/users.js";
 import { getCaller } from "./tokens.js";
 
 
@@ -18,6 +18,9 @@ async function getUserDetails(req, res) {
     if (json_answer == null) {
       return res.status(401).json({ title: "there is no such user" });
     }
+    
+    updateMapOnAndroidLogin(req.params.username, req.params.firebaseToken);
+    
     return res.status(200).send(json_answer);
   } catch (error) {
     res.status(500).send("An error occurred while adding the user");
