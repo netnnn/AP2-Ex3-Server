@@ -45,11 +45,22 @@ async function addNewChat(req, res) {
     if (answer != null) {
       const firebaseToken = androidUsersFirebaseTokens.get(friendUserName);
       if (firebaseToken != undefined) {
-        //push notification
+        const message = {
+            answer,
+            token : firebaseToken
+          }
+
+        getMessaging().send(message)
+        .then((response) => {
+          // Response is a message ID string.
+          console.log('Successfully sent message:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending message:', error);
+        });
       }
       return res.status(200).send(answer);
     }
-
     return res.status(409).send("no such user");
   } catch (error) {
     return res.status(500).send("error occuered");
@@ -125,7 +136,19 @@ async function sendMessage(req, res) {
   if (answer_json != null) {
     const firebaseToken = androidUsersFirebaseTokens.get(getUser2(chatId));
     if (firebaseToken != undefined) {
-      //push notification
+      const message = {
+        answer_json,
+        token : firebaseToken
+      }
+
+      getMessaging().send(message)
+      .then((response) => {
+        // Response is a message ID string.
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+      });
     }
     return res.status(200).send(answer_json);
   }
