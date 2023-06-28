@@ -10,6 +10,7 @@ import {
   getAllMsgByChatId,
   getUser2
 } from "../services/chats.js";
+import {admin} from "../app.js"
 
 import jwt from "jsonwebtoken";
 const key = "Never gonna give you up";
@@ -50,7 +51,7 @@ async function addNewChat(req, res) {
             token : firebaseToken
           }
 
-        getMessaging().send(message)
+        admin.messaging().send(message)
         .then((response) => {
           // Response is a message ID string.
           console.log('Successfully sent message:', response);
@@ -141,7 +142,7 @@ async function sendMessage(req, res) {
         token : firebaseToken
       }
 
-      getMessaging().send(message)
+      admin.messaging.send(message)
       .then((response) => {
         // Response is a message ID string.
         console.log('Successfully sent message:', response);
