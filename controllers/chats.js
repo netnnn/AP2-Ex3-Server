@@ -1,3 +1,4 @@
+import { androidUsersFirebaseTokens } from "../models/users.js";
 import {
   getChatsByUserName,
   addChat,
@@ -7,7 +8,9 @@ import {
   readChat,
   addMsgByChatId,
   getAllMsgByChatId,
+  getUser2
 } from "../services/chats.js";
+import {admin} from "../app.js"
 
 import jwt from "jsonwebtoken";
 const key = "Never gonna give you up";
@@ -27,8 +30,8 @@ async function getAllChats(req, res) {
 async function addNewChat(req, res) {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const data = jwt.verify(token, key);
-    const username = data.username;
+    const mdata = jwt.verify(token, key);
+    const username = mdata.username;
     const friendUserName = req.body.username;
 
     if (username == null || friendUserName == null) {
@@ -41,9 +44,30 @@ async function addNewChat(req, res) {
     var answer = await addChat(username, friendUserName); //return json created chat if addition succeded, else return: ''.
 
     if (answer != null) {
+      const firebaseToken = androidUsersFirebaseTokens.get(friendUserName);
+      if (firebaseToken != undefined) {
+        const message = {
+          notification: {
+            title: "New chat!",
+            body: ""
+          },
+          data : {
+            chatJson: answer
+          },
+            token : firebaseToken
+          }
+
+        admin.messaging().send(message)
+        .then((response) => {
+          // Response is a message ID string.
+          console.log('Successfully sent message:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending message:', error);
+        });
+      }
       return res.status(200).send(answer);
     }
-
     return res.status(409).send("no such user");
   } catch (error) {
     return res.status(500).send("error occuered");
@@ -97,8 +121,8 @@ async function deleteChat(req, res) {
 
 async function sendMessage(req, res) {
   const token = req.headers.authorization.split(" ")[1];
-  const data = jwt.verify(token, key);
-  const username = data.username;
+  const mdata = jwt.verify(token, key);
+  const username = mdata.username;
   const chatId = req.params.id;
   const content = req.body.msg;
 
@@ -117,6 +141,28 @@ async function sendMessage(req, res) {
 
   var answer_json = await addMsgByChatId(username, chatId, content);
   if (answer_json != null) {
+    const firebaseToken = androidUsersFirebaseTokens.get(getUser2(chatId));
+    if (firebaseToken != undefined) {
+      const message = {
+        notification: {
+          title: "New Message!",
+          body: answer_json.content
+        },
+        data : {
+          messageJson: answer_json
+        },
+          token : firebaseToken
+        }
+
+      admin.messaging.send(message)
+      .then((response) => {
+        // Response is a message ID string.
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+      });
+    }
     return res.status(200).send(answer_json);
   }
   return res.status(500).send("error occuered on sending msg");

@@ -35,8 +35,9 @@ const UserSchema = new Schema({
 
 const User = mongoose.model('User', UserSchema);
 
-
+const androidUsersFirebaseTokens = new Map();
 
 export {
-    User
+    User,
+    androidUsersFirebaseTokens
 }

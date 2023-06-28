@@ -9,7 +9,10 @@ import routesUsers from './routes/users.js';
 import {Server} from "socket.io";
 import http from "http";
 
-
+import admin from 'firebase-admin';
+admin.initializeApp({
+  credential: admin.credential.cert('./serviceAccountKey.json')
+});
 
 // customEnv.env(process.env.NODE_ENV, './config')
 //process.env.CONNECTION_STRING 
@@ -20,6 +23,7 @@ mongoose.connect("mongodb://localhost:27017/myDB", {
 });
 
 const app = express();
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors : {
@@ -141,6 +145,7 @@ var highestIdMsg;
  }
 
  export {
+    admin,
     getHighestIdChats,
     getHighestIdMsg,
     getHighestIdUsers,
