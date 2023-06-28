@@ -9,11 +9,26 @@ import routesUsers from './routes/users.js';
 import {Server} from "socket.io";
 import http from "http";
 
-const admin = require("firebase-admin");
-//path to firebase server admin private key
-const serviceAccount = require("barmats-web-firebase-adminsdk-wrxt0-37a02555a1.json");
+import admin from 'firebase-admin';
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert('./serviceAccountKey.json')
+});
+
+const message = {
+  notification: {
+    title: "test title",
+    body: "test body"
+  },
+  token : "d5am7TkOS6u2QB4nexSwXZ:APA91bHdYVDHK0wP9v1mvUZdbI10y1hR3qv9gWdLmjDLEAliMw9epoK-cgmx8ee0ywz0o_x7ghR5grO2zI1FAtr6cdyx7NY1XmX7iGhzEykye4jLS-iicku5Lougf-EoeDiqOcfBurP0"
+}
+
+admin.messaging().send(message)
+.then((response) => {
+// Response is a message ID string.
+console.log('Successfully sent message:', response);
+})
+.catch((error) => {
+console.log('Error sending message:', error);
 });
 
 // customEnv.env(process.env.NODE_ENV, './config')

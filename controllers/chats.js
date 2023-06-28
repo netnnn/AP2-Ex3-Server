@@ -30,8 +30,8 @@ async function getAllChats(req, res) {
 async function addNewChat(req, res) {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const data = jwt.verify(token, key);
-    const username = data.username;
+    const mdata = jwt.verify(token, key);
+    const username = mdata.username;
     const friendUserName = req.body.username;
 
     if (username == null || friendUserName == null) {
@@ -47,7 +47,13 @@ async function addNewChat(req, res) {
       const firebaseToken = androidUsersFirebaseTokens.get(friendUserName);
       if (firebaseToken != undefined) {
         const message = {
-            answer,
+          notification: {
+            title: "New chat!",
+            body: ""
+          },
+          data : {
+            chatJson: answer
+          },
             token : firebaseToken
           }
 
@@ -115,8 +121,8 @@ async function deleteChat(req, res) {
 
 async function sendMessage(req, res) {
   const token = req.headers.authorization.split(" ")[1];
-  const data = jwt.verify(token, key);
-  const username = data.username;
+  const mdata = jwt.verify(token, key);
+  const username = mdata.username;
   const chatId = req.params.id;
   const content = req.body.msg;
 
@@ -138,9 +144,15 @@ async function sendMessage(req, res) {
     const firebaseToken = androidUsersFirebaseTokens.get(getUser2(chatId));
     if (firebaseToken != undefined) {
       const message = {
-        answer_json,
-        token : firebaseToken
-      }
+        notification: {
+          title: "New Message!",
+          body: answer_json.content
+        },
+        data : {
+          messageJson: answer_json
+        },
+          token : firebaseToken
+        }
 
       admin.messaging.send(message)
       .then((response) => {
